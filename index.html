@@ -1,0 +1,586 @@
+<title>Water Habit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap">
+<style>
+/* Layout: notes column on the left, the phone on the right; on a phone the app fills the screen. */
+:root{
+  --page:#E9F1F2; --page-ink:#12343B; --page-muted:#4F6266; --page-line:#C9D8DA;
+  --font:"Nunito", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--page:#0E1E22; --page-ink:#E4F1F2; --page-muted:#9DB3B6; --page-line:#24414A; color-scheme:dark}}
+:root[data-theme="dark"]{--page:#0E1E22; --page-ink:#E4F1F2; --page-muted:#9DB3B6; --page-line:#24414A; color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--page);color:var(--page-ink);font-family:var(--font);margin:0}
+.stage{min-height:100%;display:flex;gap:56px;align-items:center;justify-content:center;padding-block:32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));flex-wrap:wrap}
+.notes{max-width:360px;display:flex;flex-direction:column;gap:24px;min-width:0}
+.notes h1{font-size:42px;line-height:46px;margin:0;font-weight:900;letter-spacing:-.02em}
+.notes p{margin:0;font-size:16px;line-height:24px;font-weight:600;color:var(--page-muted)}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--page-muted)}
+.jump{display:flex;flex-wrap:wrap;gap:8px}
+.jump button{font:700 14px/20px var(--font);color:var(--page-ink);background:transparent;border:1px solid var(--page-line);border-radius:999px;padding:8px 14px;cursor:pointer}
+.jump button:hover{border-color:var(--page-ink)}
+.legend{font-size:14px;line-height:20px;color:var(--page-muted);border-top:1px solid var(--page-line);padding-top:16px}
+
+/* ---- phone (the app has one light look by design) ---- */
+.phone{
+  --app:#F4F8F8; --card:#FFFFFF; --tint:#E4F4F5; --primary:#1F6672; --deep:#12343B; --water:#8FD4DA; --water-soft:#BFE7EA;
+  --streak:#FFF3CC; --streak-strong:#FFD66B; --other:#FCE6DE; --other-ink:#A8441F; --success:#DDF1E7; --success-ink:#22654A;
+  --danger:#A82E26; --danger-soft:#FBE4E1; --ink:#12343B; --muted:#56676B; --line:#D3DDDE; --control:#E6EDEE;
+  width:375px;height:780px;border-radius:44px;background:var(--app);color:var(--ink);position:relative;overflow:hidden;
+  box-shadow:0 0 0 10px #12343B,0 40px 80px rgba(18,52,59,.28);font-family:var(--font);flex:none;color-scheme:light
+}
+@media (max-width:440px){
+  .stage{padding:0;gap:0;display:block}
+  .notes{display:none}
+  .phone{width:100%;height:100%;border-radius:0;box-shadow:none}
+}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column}
+.status{height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 24px 0 32px;font:800 16px/1 var(--font)}
+.status svg{display:block}
+.scroll{flex:1;overflow-y:auto;padding:8px 20px 24px;display:flex;flex-direction:column;gap:24px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.homebar{height:34px;flex:none;display:flex;justify-content:center;align-items:flex-end;padding-bottom:8px}
+.homebar i{width:134px;height:5px;border-radius:3px;background:var(--ink);display:block}
+h2,h3,p{margin:0}
+.h1{font-size:30px;line-height:36px;font-weight:900;letter-spacing:-.01em}
+.h2{font-size:22px;line-height:28px;font-weight:800}
+.h3{font-size:17px;line-height:24px;font-weight:800}
+.body{font-size:16px;line-height:24px;font-weight:700}
+.small{font-size:14px;line-height:20px;font-weight:600}
+.cap{font-size:12px;line-height:16px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+button{font-family:inherit;color:inherit}
+.btn{height:56px;border-radius:16px;border:0;font:800 16px/24px var(--font);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;width:100%;padding:0 24px}
+.btn.m{height:44px;border-radius:12px;width:auto;padding:0 12px}
+.btn.primary{background:var(--primary);color:#fff}
+.btn.dark{background:var(--deep);color:#fff}
+.btn.secondary{background:var(--card);border:1px solid var(--line)}
+.btn.tertiary{background:transparent;color:var(--primary)}
+.btn.destructive{background:var(--danger-soft);color:var(--danger)}
+.btn:focus-visible,.chip:focus-visible,.qa:focus-visible,.row:focus-visible,.seg button:focus-visible,.tab:focus-visible,.icon-btn:focus-visible{outline:3px solid var(--water);outline-offset:2px}
+.icon-btn{width:44px;height:44px;border-radius:999px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
+.ico{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ico.s{width:20px;height:20px}
+.nav{height:56px;flex:none;display:flex;align-items:center;gap:8px;padding:0 20px 0 12px}
+.field{display:flex;flex-direction:column;gap:8px}
+.field label{font-size:14px;line-height:20px;font-weight:700}
+.input{height:52px;border-radius:12px;border:1px solid var(--line);background:var(--card);display:flex;align-items:center;padding:0 8px 0 16px;gap:8px}
+.input:focus-within{border:2px solid var(--primary);padding-left:15px}
+.input.err{border:2px solid var(--danger);padding-left:15px}
+.input input{border:0;outline:0;background:transparent;font:700 16px/24px var(--font);flex:1;min-width:0;color:var(--ink)}
+.hint{font-size:14px;line-height:20px;color:var(--muted)}
+.hint.err{color:var(--danger)}
+.card{background:var(--card);border-radius:20px}
+.grow{flex:1;min-width:0}
+.row>.body.muted,.row>span:last-child{flex:none}
+.center{text-align:center}
+/* home */
+.greet{display:flex;justify-content:space-between;align-items:center}
+.streak{display:flex;align-items:center;gap:4px;background:var(--streak);border-radius:999px;padding:8px 12px;font-size:14px;font-weight:800}
+.progress{display:flex;gap:16px;align-items:center;padding:20px 20px 20px 12px;border-radius:28px;background:var(--card);transition:background .4s}
+.progress.done{background:var(--success)}
+.bottle{width:98px;height:140px;flex:none}
+.bottle{overflow:visible}
+.bottle .water{transition:transform .9s cubic-bezier(.2,.8,.2,1)}
+.bottle .wave1{animation:wave 3.2s linear infinite}
+.bottle .wave2{animation:wave 4.6s linear infinite reverse}
+.bottle .bub{animation:bub 3.4s ease-in infinite}
+@keyframes wave{to{transform:translateX(70px)}}
+@keyframes bub{0%{transform:translateY(0);opacity:0}15%{opacity:.7}100%{transform:translateY(var(--rise,-110px));opacity:0}}
+.bottle .bubbles{transition:transform .9s cubic-bezier(.2,.8,.2,1)}
+.bottle.float{animation:float 4.2s ease-in-out infinite;transform-origin:50% 100%}
+@keyframes float{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-3px) rotate(-1.2deg)}70%{transform:translateY(-1px) rotate(1deg)}}
+@media (prefers-reduced-motion:reduce){.bottle.float,.bottle .wave1,.bottle .wave2,.bottle .bub{animation:none}.bottle .water,.bottle .bubbles{transition:none}}
+.amount{display:flex;align-items:baseline;gap:4px}
+.amount b{font-size:34px;line-height:40px;font-weight:900;letter-spacing:-.01em}
+.left{display:flex;gap:8px;align-items:flex-start;padding-top:8px;color:var(--primary);font-weight:800;font-size:16px;line-height:24px}
+.done .left{color:var(--success-ink)}
+.qa-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.qa{border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px;align-items:flex-start;text-align:left;cursor:pointer;border:1px solid var(--line);background:var(--card)}
+.qa.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.qa .t{font-size:17px;line-height:24px;font-weight:900;white-space:nowrap}
+.qa .l{font-size:14px;line-height:20px;font-weight:700;color:var(--muted)}
+.qa.primary .l{color:#E4F4F5}
+.qa.primary .ico{color:#fff}.qa .ico{color:var(--primary)}
+.qa:active{transform:scale(.97)}
+.list{padding:4px 16px}
+.rec{display:flex;align-items:center;gap:12px;padding:12px 0}
+.rec+.rec{border-top:1px solid var(--line)}
+.dot{width:40px;height:40px;border-radius:999px;display:grid;place-items:center;flex:none;background:var(--tint);color:var(--primary)}
+.dot.other{background:var(--other);color:var(--other-ink)}
+.rec .r{text-align:right}
+.note-other{color:var(--other-ink)}
+.head{display:flex;justify-content:space-between;align-items:center}
+.banner{display:flex;gap:12px;align-items:center;background:var(--streak);border-radius:20px;padding:16px}
+.banner .dot{background:var(--streak-strong);color:var(--ink)}
+.tabbar{flex:none;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:space-between;padding:8px 24px 0}
+.tab{width:88px;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 0;cursor:pointer;color:var(--muted);font:700 14px/20px var(--font)}
+.tab span.pill{width:56px;height:28px;border-radius:999px;display:grid;place-items:center}
+.tab.on{color:var(--primary);font-weight:900}.tab.on span.pill{background:var(--tint)}
+.bottom{flex:none;background:var(--card)}
+/* overlays */
+.toast{position:absolute;left:50%;top:6px;transform:translate(-50%,-8px);background:var(--deep);color:#fff;border-radius:999px;padding:6px 12px 6px 8px;display:flex;gap:4px;align-items:center;font-size:13px;line-height:18px;font-weight:800;box-shadow:0 4px 12px rgba(18,52,59,.15);opacity:0;transition:.3s;pointer-events:none;z-index:20;white-space:nowrap}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.snack{position:absolute;left:20px;right:20px;bottom:110px;background:var(--deep);color:#fff;border-radius:16px;padding:12px 8px 12px 16px;display:flex;align-items:center;gap:12px;z-index:20;transform:translateY(16px);opacity:0;transition:.25s;pointer-events:none}
+.snack.show{transform:none;opacity:1;pointer-events:auto}
+.snack #snackText{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.snack .ok{width:32px;height:32px;border-radius:999px;background:var(--water);display:grid;place-items:center;color:var(--ink)}
+.snack button{background:transparent;border:0;color:#fff;font:800 16px/24px var(--font);display:flex;gap:8px;align-items:center;padding:8px 12px;cursor:pointer;border-radius:12px}
+.scrim{position:absolute;inset:0;background:rgba(18,52,59,.45);z-index:30;opacity:0;transition:.25s;pointer-events:none}
+.scrim.show{opacity:1;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:28px 28px 0 0;padding:12px 20px 0;display:flex;flex-direction:column;gap:24px;max-height:92%;overflow-y:auto;scrollbar-width:none;z-index:31;transform:translateY(105%);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.sheet.show{transform:none}
+.handle{width:40px;height:5px;border-radius:3px;background:var(--control);align-self:center}
+.types{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 8px}
+.name-field{display:flex;flex-direction:column;gap:8px}
+.icons{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.count-note{display:flex;gap:8px;align-items:center;padding:8px 12px;border-radius:12px;font-weight:800;font-size:14px;line-height:20px}
+.count-note.yes{background:var(--success);color:var(--success-ink)}
+.count-note.no{background:var(--other);color:var(--other-ink)}
+.chip .wmark{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:999px;background:var(--water);box-shadow:0 0 0 2px var(--card)}
+.save-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.chip{position:relative;border:0;border-radius:16px;background:var(--app);padding:12px 4px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;font:700 14px/20px var(--font);color:var(--muted);min-width:0}
+.chip .nm{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 6px}
+.chip .x{position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:999px;background:var(--deep);color:#fff;display:grid;place-items:center;font:900 13px/1 var(--font)}
+.chip.add{border:1.5px dashed var(--line);background:var(--card)}
+.chip.on{background:var(--tint);box-shadow:inset 0 0 0 2px var(--primary);color:var(--primary);font-weight:900}
+.stepper{display:flex;justify-content:space-between;align-items:center}
+.round{width:52px;height:52px;border-radius:999px;border:0;display:grid;place-items:center;cursor:pointer;background:var(--control)}
+.round.plus{background:var(--tint);color:var(--primary)}
+.big{font-size:48px;line-height:56px;font-weight:900;letter-spacing:-.02em}
+.ml-field{display:flex;align-items:baseline;justify-content:center;gap:8px;border:2px solid var(--primary);border-radius:16px;padding:4px 16px;background:var(--card);cursor:text}
+.ml-field input{width:4.2ch;border:0;outline:0;background:transparent;font:900 44px/52px var(--font);text-align:right;color:var(--ink);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.ml-field span{font:800 22px/28px var(--font);color:var(--muted)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.presets{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.presets button{height:40px;border-radius:999px;border:0;background:var(--app);font:800 14px/20px var(--font);cursor:pointer}
+.presets button.on{background:var(--primary);color:#fff}
+.dialog{position:absolute;left:32px;right:32px;top:50%;transform:translateY(-50%) scale(.96);background:var(--card);border-radius:28px;padding:24px 24px 20px;display:flex;flex-direction:column;gap:16px;align-items:center;z-index:31;opacity:0;pointer-events:none;transition:.2s}
+.dialog.show{opacity:1;pointer-events:auto;transform:translateY(-50%)}
+/* history */
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;border-radius:12px;background:var(--control)}
+.seg button{height:36px;border:0;border-radius:12px;background:transparent;font:700 14px/20px var(--font);color:var(--muted);cursor:pointer}
+.seg button.on{background:var(--card);color:var(--ink);font-weight:900;box-shadow:0 1px 3px rgba(18,52,59,.08)}
+.bar{height:8px;border-radius:999px;background:var(--control);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--primary);border-radius:999px;transition:width .5s}
+.group-h{display:flex;align-items:center;gap:8px;padding:12px 0;width:100%;background:transparent;border:0;text-align:left;cursor:pointer}
+.chev{transition:transform .2s;color:var(--muted)}
+.open .chev{transform:rotate(90deg)}
+.chart{display:flex;align-items:flex-end;justify-content:space-between;height:176px;position:relative;padding-top:16px;overflow:hidden}
+.chart .col{display:flex;flex-direction:column;align-items:center;gap:8px;width:28px}
+.chart .b{width:28px;border-radius:8px 8px 4px 4px;background:var(--water-soft)}
+.chart .b.ok{background:var(--water)}.chart .b.today{background:var(--primary)}
+.goal-line{position:absolute;left:0;right:0;border-top:1.5px dashed var(--primary)}
+.goal-line span{position:absolute;right:0;top:-20px;background:var(--card);padding:0 4px;border-radius:4px;font-size:11px;font-weight:700;color:var(--primary);letter-spacing:.02em}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;justify-items:center}
+.cal span{width:36px;height:36px;border-radius:999px;display:grid;place-items:center;font-size:14px;font-weight:700}
+.legend-row{display:flex;gap:16px;flex-wrap:wrap}
+.legend-row span{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--muted)}
+.legend-row i{width:10px;height:10px;border-radius:999px;display:block}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px}
+/* profile */
+.group{background:var(--card);border-radius:20px;overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;padding:16px;width:100%;background:transparent;border:0;text-align:left;cursor:pointer}
+.row+.row{border-top:1px solid var(--line)}
+.row .ib{width:36px;height:36px;border-radius:12px;background:var(--tint);color:var(--primary);display:grid;place-items:center;flex:none}
+.toggle{width:51px;height:31px;border-radius:999px;background:var(--control);position:relative;flex:none;transition:background .2s;border:0;cursor:pointer;padding:0}
+.toggle::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:999px;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.15);transition:transform .2s}
+.toggle[aria-checked="true"]{background:var(--primary)}
+.toggle[aria-checked="true"]::after{transform:translateX(20px)}
+.badges{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px 4px}
+.badge{border:0;background:none;padding:0;cursor:pointer;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;font-family:var(--font);color:var(--ink)}
+.badge .small{line-height:18px;margin-top:4px}.badge .cap{font-size:11px;line-height:14px}
+.badge:active .m{transform:scale(.94)}
+.badge .m,.badge-prev .m{border-radius:999px;display:grid;place-items:center;flex:none;transition:transform .15s}
+.lock .m{background:var(--control);color:var(--muted)}
+.avatar{border-radius:999px;display:grid;place-items:center;flex:none;font-weight:900;line-height:1}
+.av-btn{position:relative;border:0;background:none;padding:0;cursor:pointer;border-radius:999px;flex:none}
+.av-edit{position:absolute;right:-2px;bottom:-2px;width:28px;height:28px;border-radius:999px;background:var(--primary);color:#fff;display:grid;place-items:center;box-shadow:0 0 0 3px var(--app)}
+.av-edit .ico{width:16px;height:16px}
+.swatches{display:flex;gap:12px}
+.sw{width:40px;height:40px;border-radius:999px;border:0;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.sw.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--primary)}
+.scroll>*{flex-shrink:0}
+.settings-sec{display:flex;flex-direction:column;gap:8px}
+.row .val{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acc-form{margin:0}
+.demo-note{display:flex;gap:8px;align-items:center;padding:12px 16px;background:var(--tint);color:var(--primary)}
+.demo-note .small{color:var(--ink)}
+.link-btn{align-self:flex-start;border:0;background:none;padding:4px 0;margin-top:-8px;font:800 14px/20px var(--font);color:var(--primary);cursor:pointer}
+.show-pw{align-self:flex-start;display:flex;gap:8px;align-items:center;border:0;background:none;padding:4px 0;font:800 14px/20px var(--font);color:var(--primary);cursor:pointer}
+.rules{padding:16px;display:flex;flex-direction:column;gap:8px}
+.meter{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}.meter i{height:6px;border-radius:999px;background:var(--control)}
+.meter i.s1{background:var(--danger)}.meter i.s2{background:#E3A33A}.meter i.s3{background:#5FAFB8}.meter i.s4{background:var(--success-ink)}
+.rule{display:flex;gap:8px;align-items:center;font-size:14px;line-height:20px;color:var(--muted);font-weight:700}.rule.ok{color:var(--success-ink)}
+.sr-only{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+
+.goal-field{flex:1;margin:0 12px;height:72px;border-radius:16px;border:2px solid var(--primary);background:var(--card);display:flex;align-items:baseline;justify-content:center;gap:8px;padding-top:8px}
+.goal-field input{width:140px;border:0;outline:0;background:transparent;font:900 42px/52px var(--font);text-align:right;color:var(--ink);letter-spacing:-.02em}
+.notif{background:var(--tint);border-radius:20px;padding:16px;display:flex;gap:12px}
+.notif .ib{width:38px;height:38px;border-radius:12px;background:var(--primary);color:#fff;display:grid;place-items:center;flex:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="stage">
+  <section class="notes" aria-label="Про прототип">
+    <span class="eyebrow">Курсовий проєкт №3 · прототип v6</span>
+    <h1>Water Habit</h1>
+    <p>Клікабельний прототип застосунку для звички пити воду. Усі кнопки працюють: можна зареєструватись, додати воду, скасувати запис, записати чай окремо від води, переглянути історію й змінити ціль.</p>
+    <div class="jump" role="group" aria-label="Перейти до екрана">
+      <button type="button" data-jump="register">Реєстрація</button>
+      <button type="button" data-jump="home">Головна з даними</button>
+      <button type="button" data-jump="history">Історія</button>
+      <button type="button" data-jump="profile">Профіль</button>
+      <button type="button" data-jump="reset">Почати спочатку</button>
+    </div>
+    <p class="legend">Спробуй основний сценарій: тап «+250 мл» → запис одразу додано → «Скасувати» протягом 4 секунд. Дизайн: Максим Мазан, UI/UX Design, Projector.</p>
+  </section>
+
+  <div class="phone" id="phone" aria-label="Water Habit, екран телефона">
+    <div class="screen" id="app"></div>
+    <div class="toast" id="toast" role="status"></div>
+    <div class="snack" id="snack" role="status" aria-live="polite">
+      <span class="ok"><svg class="ico s" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span>
+      <span class="body grow" id="snackText">Додано 250 мл</span>
+      <button type="button" id="undo"><svg class="ico s" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3"/></svg>Скасувати</button>
+    </div>
+    <div class="scrim" id="scrim"></div>
+    <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"></div>
+    <div class="dialog" id="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dlgTitle">
+      <span class="dot" style="background:var(--danger-soft);color:var(--danger);width:52px;height:52px"><svg class="ico" viewBox="0 0 24 24"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4M16 8l4 4-4 4M20 12H10"/></svg></span>
+      <h2 class="h2 center" id="dlgTitle">Вийти з акаунта?</h2>
+      <p class="body muted center">Твої записи й серія збережуться та повернуться після наступного входу.</p>
+      <div style="display:flex;flex-direction:column;gap:8px;width:100%">
+        <button type="button" class="btn destructive" id="dlgYes">Вийти</button>
+        <button type="button" class="btn secondary" id="dlgNo">Скасувати</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const I={
+ drop:'<path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11Z"/>',
+ glass:'<path d="M6 4h12l-1.5 15.2a2 2 0 0 1-2 1.8h-5a2 2 0 0 1-2-1.8L6 4Z"/><path d="M6.8 10h10.4"/>',
+ bottle:'<path d="M10 2.5h4V5h-4zM10 5c0 2-3 3-3 6v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-9c0-3-3-4-3-6"/><path d="M7 13h10"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',minus:'<path d="M5 12h14"/>',check:'<path d="m5 12.5 4.5 4.5L19 7"/>',
+ coffee:'<path d="M4 9h12v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V9Z"/><path d="M16 11h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5v2.5M12 3.5v2.5"/>',
+ leaf:'<path d="M5 19c0-8 6-13 14-14 0 8-5 14-13 14"/><path d="m5 19 7-7"/>',sparkle:'<path d="m12 3 1.9 5.6 5.6 1.9-5.6 1.9L12 18l-1.9-5.6-5.6-1.9 5.6-1.9L12 3Z"/>',
+ flame:'<path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2.2 1-3.8 2.5-5 0 2 1 3 2 3 0-3-1-5.5.5-8Z"/>',
+ home:'<path d="M3.5 10.5 12 4l8.5 6.5V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1v-9.5Z"/>',chart:'<path d="M5 20V11M11 20V5M17 20v-6M3 20h18"/>',
+ user:'<circle cx="12" cy="8" r="4"/><path d="M4 20.5c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/>',back:'<path d="m15 6-6 6 6 6"/>',chev:'<path d="m9 6 6 6-6 6"/>',
+ bell:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15L6 16Z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+ sliders:'<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>',logout:'<path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4M16 8l4 4-4 4M20 12H10"/>',
+ mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/>',eye:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
+ trophy:'<path d="M8 4h8v5a4 4 0 0 1-8 0V4ZM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8M10 17h4"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+ medal:'<circle cx="12" cy="15" r="5"/><path d="m8.5 11.5-3-8h4l2.5 5M15.5 11.5l3-8h-4L12 8.5"/><path d="m12 13 .8 1.6 1.7.2-1.2 1.2.3 1.7-1.6-.8-1.6.8.3-1.7-1.2-1.2 1.7-.2Z"/>',
+ star:'<path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9L12 3.5Z"/>',
+ crown:'<path d="M4 8l4 4 4-7 4 7 4-4-1.5 10h-13L4 8ZM5.5 21h13"/>',
+ heart:'<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z"/>',
+ bolt:'<path d="M13 2.5 5 13.5h6l-1 8 8-11h-6l1-8Z"/>',
+ sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>',
+ camera:'<path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13.5" r="3.5"/>',
+ pencil:'<path d="M4 20h4L19 9l-4-4L4 16v4ZM13.5 6.5l4 4"/>',
+ lock:'<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5M12 14.5v2.5"/>',face:'<path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M9 9.5v1M15 9.5v1M12 9.5v3.5h-1M9.5 16a4 4 0 0 0 5 0"/>',trash:'<path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12M10 11v5M14 11v5"/>',dotc:'<circle cx="12" cy="12" r="7"/>',
+ moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/>',calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>'};
+const ic=(n,cls='')=>`<svg class="ico ${cls}" viewBox="0 0 24 24" aria-hidden="true">${I[n]}</svg>`;
+const BUILTIN=[{id:'water',name:'Вода',icon:'drop',water:true,builtin:true},{id:'tea',name:'Чай',icon:'leaf',water:false,builtin:true},{id:'coffee',name:'Кава',icon:'coffee',water:false,builtin:true}];
+const ICONS=['sparkle','glass','bottle','drop','leaf','coffee'];
+const isWater=r=>r.kind==='water'||r.water===true;
+const drinkName=r=>r.name||(BUILTIN.find(x=>x.id===r.kind)||{name:'Напій'}).name;
+const drinkIcon=r=>r.icon||(BUILTIN.find(x=>x.id===r.kind)||{icon:'sparkle'}).icon;
+const loadDrinks=()=>{try{const v=JSON.parse(localStorage.getItem('wh-drinks-v2')||'null'); if(Array.isArray(v)&&v.length&&v.every(x=>x&&typeof x.id==='string'&&typeof x.name==='string')){const ids=v.map(x=>x.id); return [...v.map(x=>({id:x.id,name:String(x.name).slice(0,20),icon:ICONS.includes(x.icon)?x.icon:'sparkle',water:!!x.water,builtin:!!BUILTIN.find(b=>b.id===x.id)})),...BUILTIN.filter(b=>!ids.includes(b.id))];}}catch(e){} return BUILTIN.map(x=>({...x}));};
+const saveDrinks=()=>{try{localStorage.setItem('wh-drinks-v2',JSON.stringify(S.drinks.map(({id,name,icon,water})=>({id,name,icon,water}))));}catch(e){}};
+const drinkById=id=>S.drinks.find(x=>x.id===id);
+const BADGE_ICONS=['trophy','medal','star','crown','heart','bolt','drop','flame','sun','moon','leaf','sparkle'];
+const COLORS=[['gold','#F2D47A','#3D2E00'],['water','#BFE3F2','#0E4A63'],['mint','#C5EBD6','#14532D'],['coral','#F8CBC0','#6B2414'],['lilac','#DCD3F5','#3B2A6E'],['sea','#2F6F7E','#FFFFFF']];
+const col=k=>COLORS.find(c=>c[0]===k)||COLORS[0];
+const ACH=[{id:'first',t:'Перша склянка',icon:'drop',got:true},{id:'d7',t:'7 днів',icon:'flame',got:true},{id:'early',t:'Ранній старт',icon:'sun',got:true},{id:'d14',t:'14 днів',icon:'medal'},{id:'l50',t:'50 літрів',icon:'trophy'},{id:'g100',t:'100 склянок',icon:'star'},{id:'d30',t:'30 днів',icon:'crown'},{id:'perfect',t:'Тиждень у ціль',icon:'bolt'}];
+const achLeft=a=>a.id==='d14'?`ще ${14-S.streak} днів`:a.id==='d30'?`ще ${30-S.streak} днів`:a.id==='l50'?'ще 15,4 л':a.id==='g100'?'ще 38':'ще 3 дні';
+const loadProfile=()=>{const d={avatar:{type:'letter',color:'water',icon:'drop'},badges:{},name:'Максим',email:'maksym@gmail.com',showStreak:true,faceId:true}; try{const v=JSON.parse(localStorage.getItem('wh-profile')||'null'); if(v&&typeof v==='object'){const a=v.avatar||{}; const av={type:['letter','icon','photo'].includes(a.type)?a.type:'letter',color:col(a.color)[0],icon:BADGE_ICONS.includes(a.icon)?a.icon:'drop'}; if(av.type==='photo'){if(typeof a.src==='string'&&a.src.startsWith('data:image/')) av.src=a.src; else av.type='letter';} const b={}; if(v.badges&&typeof v.badges==='object') for(const k in v.badges){const x=v.badges[k]; if(ACH.find(y=>y.id===k)&&x&&BADGE_ICONS.includes(x.icon)) b[k]={icon:x.icon,color:col(x.color)[0]};} const nm=typeof v.name==='string'&&v.name.trim().length>=2?v.name.trim().slice(0,30):d.name; const em=typeof v.email==='string'&&/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.email)?v.email:d.email; return {avatar:av,badges:b,name:nm,email:em,showStreak:v.showStreak!==false,faceId:v.faceId!==false};}}catch(e){} return d;};
+const saveProfile=()=>{try{localStorage.setItem('wh-profile',JSON.stringify(S.profile));}catch(e){try{const p={...S.profile,avatar:{...S.profile.avatar}}; delete p.avatar.src; if(p.avatar.type==='photo') p.avatar.type='letter'; localStorage.setItem('wh-profile',JSON.stringify(p));}catch(e2){}}};
+const badgeLook=a=>{const o=S.profile.badges[a.id]||{}; return {icon:o.icon||a.icon,color:o.color||'gold'};};
+function avatarHTML(av,size){const c=col(av.color); const fs=Math.round(size*.44); if(av.type==='photo'&&av.src) return `<span class="avatar" style="width:${size}px;height:${size}px;background:center/cover no-repeat url('${av.src}')" role="img" aria-label="Фото профілю"></span>`; return `<span class="avatar" style="width:${size}px;height:${size}px;background:${c[1]};color:${c[2]};font-size:${fs}px">${av.type==='icon'?`<svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="width:${Math.round(size*.46)}px;height:${Math.round(size*.46)}px">${I[av.icon]}</svg>`:esc(initial())}</span>`;}
+const initial=()=>((S&&S.profile&&S.profile.name)||'М').trim().charAt(0).toUpperCase();
+const greetName=()=>{const n=S.profile.name; return n==='Максим'?'Максиме':esc(n);};
+function badgeCircle(a,look,size=56){const c=col(look.color); return `<span class="m" style="width:${size}px;height:${size}px;${a.got?`background:${c[1]};color:${c[2]}`:''}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="width:${Math.round(size*.42)}px;height:${Math.round(size*.42)}px">${I[look.icon]}</svg></span>`;}
+const fmt=n=>n.toLocaleString('uk-UA').replace(/ /g,' ');
+const now=()=>new Date();
+const hm=d=>d.toTimeString().slice(0,5);
+const atHour=(h,m)=>{const d=now(); d.setHours(h,m,0,0); return d;};
+const weekday=['Неділя','Понеділок','Вівторок','Середа','Четвер','Пʼятниця','Субота'];
+const months=['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
+const todayLabel=()=>{const d=now(); return `${weekday[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]}`;};
+
+let S;
+const sample=()=>[{id:1,kind:'water',ml:500,t:atHour(9,20)},{id:2,kind:'coffee',ml:200,t:atHour(10,40)},{id:3,kind:'water',ml:250,t:atHour(12,5)},{id:4,kind:'water',ml:250,t:atHour(13,30)},{id:5,kind:'tea',ml:300,t:atHour(15,10)},{id:6,kind:'water',ml:250,t:atHour(16,0)},{id:7,kind:'compot',name:'Компот',icon:'sparkle',water:false,ml:200,t:atHour(18,30)},{id:8,kind:'water',ml:330,t:atHour(19,45)}];
+function fresh(){S={screen:'register',pw:'water2026',pwChanged:false,pwd:{pwCur:'',pwNew:'',pwRep:'',show:false,err:''},goal:2000,records:[],streak:7,histTab:'day',histOff:0,monthOff:0,openGroups:{Вечір:true,День:true,Ранок:false},rem:{on:true,every:2,smart:true},sheet:{kind:'water',ml:350,newName:'',newWater:false,newIcon:'sparkle',edit:false},drinks:loadDrinks(),profile:loadProfile(),goalDraft:2000,pwShow:false,email:'',emailErr:'',celebrated:false,nextId:100};}
+fresh();
+const MN=['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
+const dayDate=off=>{const d=now(); d.setHours(0,0,0,0); d.setDate(d.getDate()+off); return d;};
+const rnd=seed=>{let x=Math.sin(seed*9301+49297)*233280; return x-Math.floor(x);};
+const pastCache={};
+function recordsFor(off){if(off===0) return S.records; if(pastCache[off]) return pastCache[off]; const d=dayDate(off); const seed=d.getFullYear()*400+d.getMonth()*31+d.getDate(); const out=[]; let h=8+Math.floor(rnd(seed)*2), id=1;
+ const n=6+Math.floor(rnd(seed+1)*5);
+ for(let i=0;i<n&&h<22;i++){const r=rnd(seed+i*7); const kind=r<0.12?'coffee':r<0.2?'tea':r<0.24?'custom':'water'; const ml=kind==='water'?[250,330,330,500,500][Math.floor(rnd(seed+i*3)*5)]:kind==='custom'?200:[200,250,300][Math.floor(rnd(seed+i)*3)]; const t=new Date(d); t.setHours(h,Math.floor(rnd(seed+i*5)*60)); const rec={id:id++,kind,ml,t}; if(kind==='custom'){rec.kind='compot'; rec.name='Компот'; rec.icon='sparkle'; rec.water=false;} out.push(rec); h+=1+Math.floor(rnd(seed+i*11)*2);}
+ pastCache[off]=out; return out;}
+const waterOn=off=>recordsFor(off).filter(isWater).reduce((a,r)=>a+r.ml,0);
+const dayLabel=off=>{const d=dayDate(off); const base=`${d.getDate()} ${months[d.getMonth()]}`; return off===0?`Сьогодні, ${base}`:off===-1?`Вчора, ${base}`:`${weekday[d.getDay()]}, ${base}`;};
+const waterToday=()=>S.records.filter(isWater).reduce((a,r)=>a+r.ml,0);
+const otherToday=()=>S.records.filter(r=>!isWater(r));
+
+const app=document.getElementById('app');
+const statusBar=`<div class="status"><span class="num">9:41</span><svg width="70" height="12" viewBox="0 0 70 12" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx="1" fill="currentColor"/><rect x="4.5" y="6" width="3" height="6" rx="1" fill="currentColor"/><rect x="9" y="3.5" width="3" height="8.5" rx="1" fill="currentColor"/><rect x="13.5" y="1" width="3" height="11" rx="1" fill="currentColor"/><path d="M24.2 4.4a9.6 9.6 0 0 1 12.6 0M26.7 7a6 6 0 0 1 7.6 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="30.5" cy="9.8" r="1.4" fill="currentColor"/><rect x="43.5" y=".5" width="22" height="11" rx="3.2" fill="none" stroke="currentColor" stroke-opacity=".4"/><rect x="45.5" y="2.5" width="18" height="7" rx="1.6" fill="currentColor"/><rect x="67" y="4" width="1.6" height="4" rx=".8" fill="currentColor" fill-opacity=".4"/></svg></div>`;
+const homebar='<div class="homebar"><i></i></div>';
+let bottleN=0;
+const visLv=l=>{const v=Math.max(0,Math.min(1,l)); return .1+.9*v;};
+function bottle(level,w=98,from=null){const h=w*200/140; const lv=visLv(level); const y=196-134*lv; const y0=from==null?y:196-134*visLv(from); const n=++bottleN; const rise=Math.max(10,134*lv-10);
+ const body='M55 26H85V38C85 50 114 56 114 84V172A24 24 0 0 1 90 196H50A24 24 0 0 1 26 172V84C26 56 55 50 55 38Z';
+ const wave=yy=>`M-70 ${yy}q17.5-5 35 0t35 0t35 0t35 0t35 0t35 0t35 0t35 0V210H-70Z`;
+ const ticks=[0.25,0.5,0.75].map(t=>{const ty=196-134*t; return `<line x1="100" x2="108" y1="${ty}" y2="${ty}" stroke="#5FAFB8" stroke-width="2" stroke-linecap="round" opacity=".55"/>`;}).join('')+[0.125,0.375,0.625,0.875].map(t=>{const ty=196-134*t; return `<line x1="103" x2="108" y1="${ty}" y2="${ty}" stroke="#5FAFB8" stroke-width="1.5" stroke-linecap="round" opacity=".4"/>`;}).join('');
+ const bubbles=[[48,0],[66,1.2],[82,2.1],[58,3]].map(([bx,d],i)=>`<circle class="bub" cx="${bx}" cy="192" r="${2+i%2}" fill="#fff" opacity=".7" style="animation-delay:-${d}s;--rise:-${rise}px;animation-duration:${(1.6+rise/45).toFixed(2)}s"/>`).join('');
+ return `<svg class="bottle float" style="width:${w}px;height:${h}px" viewBox="0 0 140 206" aria-hidden="true"><defs>
+  <clipPath id="bc${n}"><path d="${body}"/></clipPath>
+  <linearGradient id="gl${n}" x1="0" x2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#F3FAFB"/><stop offset="1" stop-color="#E3F3F5"/></linearGradient>
+  <linearGradient id="wt${n}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A6E0E5"/><stop offset="1" stop-color="#4FB2BD"/></linearGradient>
+  <linearGradient id="cp${n}" x1="0" x2="1"><stop offset="0" stop-color="#2B7C88"/><stop offset=".5" stop-color="#1F6672"/><stop offset="1" stop-color="#174F59"/></linearGradient></defs>
+ <ellipse cx="70" cy="200" rx="40" ry="4.5" fill="#12343B" opacity=".08"/>
+ <path d="${body}" fill="url(#gl${n})"/>
+ <g clip-path="url(#bc${n})">
+  <g class="water" style="transform:translateY(${y0}px)" data-y="${y}">
+   <path class="wave2" d="${wave(-3)}" fill="#8FD4DA" opacity=".55"/>
+   <path class="wave1" d="${wave(0)}" fill="url(#wt${n})"/>
+   <g class="bubbles" style="transform:translateY(${-y0}px)" data-y="${-y}">${bubbles}</g>
+  </g>
+  <rect x="36" y="111" width="68" height="46" rx="13" fill="#fff" opacity=".72"/>
+  <path d="M70 120.5s10 10.6 10 17.2a10 10 0 0 1-20 0c0-6.6 10-17.2 10-17.2Z" fill="#1F6672"/>
+  <path d="M65.6 139.4a4.6 4.6 0 0 0 3.2 3.9" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none" opacity=".7"/>
+  ${ticks}
+  <path d="M36 92v62" stroke="#fff" stroke-width="7" stroke-linecap="round" opacity=".75"/>
+  <path d="M36 164v8" stroke="#fff" stroke-width="7" stroke-linecap="round" opacity=".6"/>
+  <path d="M40 66c4-6 10-10 15-12" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none" opacity=".8"/>
+ </g>
+ <path d="${body}" fill="none" stroke="#9ED7DC" stroke-width="3"/>
+ <rect x="52" y="24" width="36" height="7" rx="2.5" fill="#BFE7EA"/>
+ <rect x="47" y="3" width="46" height="23" rx="7" fill="url(#cp${n})"/>
+ ${[55,62,69,76,83].map(x=>`<rect x="${x}" y="7" width="2.4" height="15" rx="1.2" fill="#fff" opacity=".18"/>`).join('')}
+ <rect x="50" y="5" width="40" height="4" rx="2" fill="#fff" opacity=".22"/>
+ </svg>`;}
+const tabbar=on=>`<div class="bottom"><nav class="tabbar" aria-label="Навігація">${[['home','Головна','home'],['history','Історія','chart'],['profile','Профіль','user']].map(([k,l,i])=>`<button type="button" class="tab ${on===k?'on':''}" data-go="${k}" ${on===k?'aria-current="page"':''}><span class="pill">${ic(i)}</span>${l}</button>`).join('')}</nav>${homebar}</div>`;
+const navBar=(title,back)=>`<div class="nav"><button type="button" class="icon-btn" data-go="${back}" aria-label="Назад">${ic('back')}</button><h2 class="h2 grow">${title}</h2></div>`;
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const recRow=r=>{const other=!isWater(r); return `<div class="rec"><span class="dot ${other?'other':''}">${ic(drinkIcon(r),'s')}</span><div class="grow"><p class="body">${esc(drinkName(r))}</p><p class="small ${other?'note-other':'muted'}">${other?'Не входить у норму води':(r.kind!=='water'?'Рахується як вода':r.ml===500?'Пляшка':r.ml===250?'Склянка':'Свій обʼєм')}</p></div><div class="r"><p class="h3 num">${fmt(r.ml)} мл</p><p class="small muted num">${hm(r.t)}</p></div></div>`;};
+
+const V={
+ register(){return `${statusBar}<div class="scroll" style="align-items:center;padding-top:24px;gap:16px"><div class="grow"></div>${bottle(.62,112)}<h1 class="h1 center">Пий воду без зусиль</h1><p class="body muted center">Один тап — і склянка записана. Без анкет і підрахунку калорій.</p><div class="grow"></div>
+  <div style="display:flex;flex-direction:column;gap:12px;width:100%"><button type="button" class="btn dark" data-act="provider">Продовжити з Apple</button><button type="button" class="btn secondary" data-act="provider">Продовжити з Google</button><button type="button" class="btn tertiary" data-go="email">${ic('mail','s')}Зареєструватися через email</button></div>
+  <p class="cap center" style="text-transform:none;font-weight:500">Продовжуючи, ви погоджуєтесь з Умовами користування та Політикою конфіденційності</p>
+  <div style="display:flex;align-items:center"><span class="small muted">Вже є акаунт?</span><button type="button" class="btn tertiary m" data-go="login">Увійти</button></div></div>${homebar}`;},
+ login(){return `${statusBar}<div class="scroll" style="align-items:center;padding-top:24px;gap:16px"><div class="grow"></div>${bottle(1,104)}<h1 class="h1 center">З поверненням</h1><p class="body muted center">Твої записи й серія днів чекають.</p><div class="grow"></div>
+  <div style="display:flex;flex-direction:column;gap:12px;width:100%"><button type="button" class="btn dark" data-act="login">Увійти з Apple</button><button type="button" class="btn secondary" data-act="login">Увійти з Google</button><button type="button" class="btn tertiary" data-act="login">${ic('mail','s')}Увійти через email</button></div>
+  <div style="display:flex;align-items:center"><span class="small muted">Немає акаунта?</span><button type="button" class="btn tertiary m" data-go="register">Створити</button></div></div>${homebar}`;},
+ email(){return `${statusBar}${navBar('','register')}<form class="scroll" id="emailForm" novalidate><div style="display:flex;flex-direction:column;gap:8px"><h1 class="h1">Створіть акаунт</h1><p class="body muted">Лише email і пароль — решту налаштуєте потім.</p></div>
+  <div class="field"><label for="em">Електронна пошта</label><div class="input ${S.emailErr?'err':''}"><input id="em" type="email" autocomplete="email" placeholder="name@email.com" value="${S.email}"></div>${S.emailErr?`<p class="hint err" id="emErr">${S.emailErr}</p>`:''}</div>
+  <div class="field"><label for="pw">Пароль</label><div class="input"><input id="pw" type="${S.pwShow?'text':'password'}" autocomplete="new-password" placeholder="Мінімум 8 символів"><button type="button" class="icon-btn" data-act="pw" aria-label="${S.pwShow?'Сховати':'Показати'} пароль" style="color:var(--muted)">${ic('eye','s')}</button></div><p class="hint">Мінімум 8 символів</p></div>
+  <div class="grow"></div><button type="submit" class="btn primary">Створити акаунт</button><p class="small muted center">Спробуй taken@mail.com, щоб побачити помилку</p></form>${homebar}`;},
+ home(){const ml=waterToday(), done=ml>=S.goal, left=Math.max(0,S.goal-ml), empty=!S.records.length;
+  return `${statusBar}<div class="scroll"><div class="greet"><div><h2 class="h2">Привіт, ${greetName()}</h2><p class="small muted">${todayLabel()}</p></div>${S.profile.showStreak?`<span class="streak">${ic('flame','s')}${S.streak} днів</span>`:''}</div>
+  <div class="progress ${done?'done':''}">${bottle(ml/S.goal,98,S.lastLv??0)}<div class="grow"><p class="cap">${done?'Ціль досягнуто':'Сьогодні випито'}</p><p class="amount"><b class="num">${fmt(ml)}</b><span class="h3 muted">мл</span></p><p class="small muted">з ${fmt(S.goal)} мл</p><p class="left">${ic(done?'check':'drop','s')}<span>${empty?'Почни з першої склянки':done?`Серія — ${S.streak} днів`:`Ще ${fmt(left)} мл до цілі`}</span></p></div></div>
+  ${done?`<div class="banner"><span class="dot">${ic('flame','s')}</span><div class="grow"><p class="body">${S.streak} днів поспіль!</p><p class="small muted">Завтра — нова ціль, без тиску.</p></div></div>`:''}
+  ${empty?`<div class="card" style="display:flex;align-items:center;gap:8px;padding:12px 8px 12px 16px;background:var(--tint)"><p class="small grow">Денна ціль — ${fmt(S.goal)} мл. Рекомендована норма.</p><button type="button" class="btn tertiary m" data-go="goal">Змінити</button></div>`:''}
+  <div style="display:flex;flex-direction:column;gap:12px"><h3 class="h3">Додати одним тапом</h3><div class="qa-row">
+   <button type="button" class="qa primary" data-add="250">${ic('glass')}<span><span class="t num">+250 мл</span><br><span class="l">Склянка</span></span></button>
+   <button type="button" class="qa" data-add="500">${ic('bottle')}<span><span class="t num">+500 мл</span><br><span class="l">Пляшка</span></span></button>
+   <button type="button" class="qa" data-act="sheet">${ic('plus')}<span><span class="t">Свій</span><br><span class="l">або напій</span></span></button></div></div>
+  <div style="display:flex;flex-direction:column;gap:8px"><div class="head"><h3 class="h3">Останні записи</h3><button type="button" class="btn tertiary m" data-go="history">Уся історія</button></div>
+  <div class="card list">${empty?`<div class="rec"><span class="dot">${ic('sparkle','s')}</span><div><p class="body">Записів ще немає</p><p class="small muted">Перша склянка — один тап вище.</p></div></div>`:[...S.records].reverse().slice(0,3).map(recRow).join('')}</div></div></div>${tabbar('home')}`;},
+ history(){const tab=S.histTab;
+  let inner='';
+  if(tab==='day'){const off=S.histOff, recs=recordsFor(off); const ml=waterOn(off), oth=recs.filter(r=>!isWater(r)); const pct=Math.min(100,Math.round(ml/S.goal*100));
+   const groups=[['Вечір','18:00–23:59',r=>r.t.getHours()>=18],['День','12:00–17:59',r=>r.t.getHours()>=12&&r.t.getHours()<18],['Ранок','до 12:00',r=>r.t.getHours()<12]];
+   inner=`<div class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px"><div class="head" style="align-items:flex-end"><div><p class="cap">Вода</p><p class="amount"><b class="num">${fmt(ml)}</b><span class="small muted">/ ${fmt(S.goal)} мл</span></p></div><div style="text-align:right"><p class="cap">Інші напої</p><p class="h3 note-other num">${fmt(oth.reduce((a,r)=>a+r.ml,0))} мл · ${oth.length}</p></div></div><div class="bar"><i style="width:${pct}%"></i></div><p class="small muted">${recs.length} ${recs.length===1?'запис':recs.length>1&&recs.length<5?'записи':'записів'} · ${pct}% цілі${ml>=S.goal?' · ціль виконано':''}</p></div>`+
+   groups.map(([g,range,f])=>{const rs=recs.filter(f).reverse(); const sum=rs.filter(isWater).reduce((a,r)=>a+r.ml,0); const open=S.openGroups[g]; if(!rs.length) return `<div class="card list" style="opacity:.7"><div class="group-h" style="cursor:default"><span class="grow"><span class="body">${g} · ${range}</span><br><span class="small muted">${off===0?'Ще немає записів':'Без записів'}</span></span></div></div>`;
+    return `<div class="card list ${open?'open':''}"><button type="button" class="group-h" data-group="${g}" aria-expanded="${!!open}"><span class="grow"><span class="body">${g} · ${range}</span><br><span class="small muted">${fmt(sum)} мл води · ${rs.length} ${rs.length===1?'запис':rs.length<5?'записи':'записів'}</span></span><span class="chev">${ic('chev','s')}</span></button>${open?rs.map(recRow).join(''):''}</div>`;}).join('');}
+  if(tab==='week'){const wd=(now().getDay()+6)%7; const offs=[0,1,2,3,4,5,6].map(i=>i-wd); const days=['Пн','Вт','Ср','Чт','Пт','Сб','Нд']; const vals=offs.map(o=>o>0?0:waterOn(o)); const max=Math.max(2600,...vals)+100;
+   inner=`<div class="tiles"><div class="tile" style="background:var(--tint)">${ic('drop')}<div><p class="h2 num">${(vals.reduce((a,b)=>a+b,0)/1000).toFixed(1).replace('.',',')} л</p><p class="small muted">за цей тиждень</p></div></div><div class="tile" style="background:var(--streak)">${ic('flame')}<div><p class="h2">${S.streak} днів</p><p class="small muted">поспіль у ритмі</p></div></div></div>
+   <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px"><div class="head"><h3 class="h3">Вода по днях</h3><span class="small muted">торкнись дня</span></div><div class="chart"><div class="goal-line" style="bottom:${22+S.goal/max*140}px"><span>ЦІЛЬ</span></div>${vals.map((v,i)=>{const o=offs[i]; const fut=o>0; return `<button type="button" class="col" ${fut?'disabled':`data-openday="${o}"`} aria-label="${days[i]}: ${fmt(v)} мл" style="background:none;border:0;padding:0;cursor:${fut?'default':'pointer'}"><div class="b ${o===0?'today':v>=S.goal?'ok':''}" style="height:${fut?4:Math.max(4,v/max*140)}px;${fut?'opacity:.35':''}"></div><span class="cap">${days[i]}</span></button>`;}).join('')}</div>
+   <div class="legend-row"><span><i style="background:var(--water)"></i>ціль</span><span><i style="background:var(--water-soft)"></i>менше</span><span><i style="background:var(--primary)"></i>сьогодні</span></div></div>`;}
+  if(tab==='month'){const d=now(); const today0=dayDate(0); const md=new Date(d.getFullYear(),d.getMonth()+S.monthOff,1); const first=md; const off=(first.getDay()+6)%7; const dim=new Date(md.getFullYear(),md.getMonth()+1,0).getDate(); const partial=[3,6,11,17]; let cells='';
+   for(let i=0;i<off;i++) cells+='<span></span>';
+   let okDays=0, past=0; for(let k=1;k<=dim;k++){const cd=new Date(md.getFullYear(),md.getMonth(),k); const o=Math.round((cd-today0)/864e5); const t=o===0, fut=o>0; const v=fut?0:waterOn(o); const ok=v>=S.goal; if(!fut&&!t){past++; if(ok) okDays++;} const bg=t?'var(--primary)':fut?'var(--app)':ok?'var(--water)':'var(--water-soft)'; cells+= fut?`<span class="num" style="background:${bg};color:var(--muted)">${k}</span>`:`<button type="button" class="num" data-openday="${o}" aria-label="${k} ${months[md.getMonth()]}: ${fmt(v)} мл" style="width:36px;height:36px;border-radius:999px;border:0;cursor:pointer;font:700 14px/1 var(--font);background:${bg};color:${t?'#fff':'var(--ink)'}">${k}</button>`;}
+   const doneDays=okDays;
+   inner=`<div class="head"><button type="button" class="icon-btn" data-moff="-1" aria-label="Попередній місяць">${ic('back')}</button><h3 class="h3">${MN[md.getMonth()]} ${md.getFullYear()}</h3><button type="button" class="icon-btn" data-moff="1" aria-label="Наступний місяць" ${S.monthOff>=0?'disabled style="opacity:.3;cursor:default"':''}>${ic('chev')}</button></div><div class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px"><div class="cal">${['Пн','Вт','Ср','Чт','Пт','Сб','Нд'].map(x=>`<span class="cap" style="height:16px">${x}</span>`).join('')}${cells}</div><div class="legend-row"><span><i style="background:var(--water)"></i>ціль</span><span><i style="background:var(--water-soft)"></i>частково</span><span><i style="background:var(--primary)"></i>сьогодні</span></div></div>
+   <div class="card" style="padding:16px;background:var(--tint)"><p class="h3">${doneDays} із ${past} днів у ритмі</p><p class="small muted">Торкнись дня, щоб побачити записи. Пропущені дні нейтральні — без червоного.</p></div>`;}
+  return `${statusBar}<div class="nav" style="padding-left:20px"><h2 class="h2 grow">Історія</h2></div><div class="scroll" style="gap:16px;padding-top:4px"><div class="seg" role="tablist">${[['day','День'],['week','Тиждень'],['month','Місяць']].map(([k,l])=>`<button type="button" role="tab" aria-selected="${tab===k}" class="${tab===k?'on':''}" data-hist="${k}">${l}</button>`).join('')}</div>${tab==='day'?`<div class="head"><button type="button" class="icon-btn" data-off="-1" aria-label="Попередній день">${ic('back')}</button><h3 class="h3">${dayLabel(S.histOff)}</h3><button type="button" class="icon-btn" data-off="1" aria-label="Наступний день" ${S.histOff>=0?'disabled style="opacity:.3;cursor:default"':''}>${ic('chev')}</button></div>`:''}${inner}</div>${tabbar('history')}`;},
+ profile(){return `${statusBar}<div class="scroll" style="padding-top:16px"><div style="display:flex;align-items:center;gap:16px"><button type="button" class="av-btn" data-act="avatar" aria-label="Змінити фото профілю">${avatarHTML(S.profile.avatar,64)}<span class="av-edit">${ic('camera','s')}</span></button><div class="grow" style="min-width:0"><h2 class="h2">${esc(S.profile.name)}</h2><p class="small muted" style="overflow:hidden;text-overflow:ellipsis">${esc(S.profile.email)}</p></div><button type="button" class="icon-btn" data-go="account" aria-label="Налаштування профілю" style="background:var(--card);border-radius:999px">${ic('sliders')}</button></div>
+  <div class="tiles"><div class="tile" style="background:var(--streak)">${ic('flame')}<div><p class="h2">${S.streak} днів</p><p class="small muted">поточна серія</p></div></div><div class="tile" style="background:var(--tint)">${ic('drop')}<div><p class="h2 num">34,6 л</p><p class="small muted">за місяць</p></div></div></div>
+  <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:16px"><div style="display:flex;flex-direction:column;gap:4px"><h3 class="h3">Досягнення · ${ACH.filter(x=>x.got).length} з ${ACH.length}</h3><p class="small muted">Торкнись значка, щоб змінити іконку й колір</p></div><div class="badges">${ACH.map((x,i)=>`<button type="button" class="badge ${x.got?'':'lock'}" data-badge="${i}" aria-label="${x.t}: ${x.got?'отримано':achLeft(x)}. Змінити іконку">${badgeCircle(x,badgeLook(x))}<span class="small" style="font-weight:800">${x.t}</span><span class="cap">${x.got?'отримано':achLeft(x)}</span></button>`).join('')}</div></div>
+  <div class="group"><button type="button" class="row" data-go="account"><span class="ib">${ic('user','s')}</span><span class="grow"><span class="body" style="font-weight:600">Налаштування профілю</span><br><span class="small muted">Імʼя, email, пароль</span></span>${ic('chev','s')}</button>
+  <button type="button" class="row" data-go="goal"><span class="ib">${ic('target','s')}</span><span class="grow"><span class="body" style="font-weight:600">Денна ціль</span><br><span class="small muted">Рекомендована норма</span></span><span class="body muted num">${fmt(S.goal)} мл</span>${ic('chev','s')}</button>
+  <button type="button" class="row" data-go="reminders"><span class="ib">${ic('bell','s')}</span><span class="grow"><span class="body" style="font-weight:600">Нагадування</span><br><span class="small muted">${S.rem.on?`Кожні ${S.rem.every} год · 9:00–21:00`:'Вимкнено'}</span></span>${ic('chev','s')}</button></div>
+  <button type="button" class="btn destructive" data-act="logout">${ic('logout','s')}Вийти з акаунта</button></div>${tabbar('profile')}`;},
+ account(){const p=S.profile; const row=(go,icn,t,sub,val='')=>`<button type="button" class="row" data-go="${go}"><span class="ib">${ic(icn,'s')}</span><span class="grow"><span class="body" style="font-weight:700">${t}</span>${sub?`<br><span class="small muted">${sub}</span>`:''}</span>${val?`<span class="small muted val">${val}</span>`:''}${ic('chev','s')}</button>`; const tg=(k,icn,t,sub)=>`<div class="row" style="cursor:default"><span class="ib">${ic(icn,'s')}</span><span class="grow"><span class="body" style="font-weight:700">${t}</span><br><span class="small muted">${sub}</span></span><button type="button" class="toggle" role="switch" aria-checked="${!!p[k]}" aria-label="${t}" data-ptog="${k}"></button></div>`;
+  return `${statusBar}${navBar('Налаштування профілю','profile')}<div class="scroll" style="gap:16px;padding-top:4px">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px"><button type="button" class="av-btn" data-act="avatar" aria-label="Змінити фото профілю">${avatarHTML(p.avatar,80)}<span class="av-edit">${ic('camera','s')}</span></button><button type="button" class="btn tertiary m" data-act="avatar" style="height:36px">Змінити фото</button></div>
+  <div class="settings-sec"><p class="cap">Особисті дані</p><div class="group">${row('editName','user','Імʼя',esc(p.name))}${row('editEmail','mail','Електронна пошта',esc(p.email))}</div></div>
+  <div class="settings-sec"><p class="cap">Безпека</p><div class="group">${row('password','lock','Пароль',S.pwChanged?'Змінено сьогодні':'Востаннє змінено 3 місяці тому')}${tg('faceId','face','Вхід за Face ID','Без пароля на цьому пристрої')}</div></div>
+  <div class="settings-sec"><p class="cap">Головний екран</p><div class="group">${tg('showStreak','flame','Показувати серію','Плашка «7 днів» біля привітання')}</div></div>
+  <div class="settings-sec"><p class="cap">Акаунт</p><div class="group"><button type="button" class="row" data-act="logout"><span class="ib">${ic('logout','s')}</span><span class="grow body" style="font-weight:700">Вийти з акаунта</span></button><button type="button" class="row danger-row" data-act="deleteAcc"><span class="ib" style="background:var(--danger-soft);color:var(--danger)">${ic('trash','s')}</span><span class="grow"><span class="body" style="font-weight:700">Видалити акаунт</span><br><span class="small muted">Записи, серія й налаштування зникнуть назавжди</span></span></button></div></div>
+  </div>${homebar}`;},
+ editName(){const e=S.formErr||''; return `${statusBar}${navBar('Імʼя','account')}<form class="scroll acc-form" style="gap:16px" novalidate><div class="field"><label for="accName">Як до тебе звертатися?</label><div class="input ${e?'err':''}"><input id="accName" maxlength="30" autocomplete="given-name" value="${esc(S.formVal??S.profile.name)}" ${e?'aria-invalid="true" aria-describedby="accErr"':''}></div>${e?`<p class="hint err" id="accErr">${e}</p>`:'<p class="hint">Так тебе вітатиме головний екран.</p>'}</div><div class="grow"></div><button type="submit" class="btn primary" data-act="saveName">Зберегти</button></form>${homebar}`;},
+ editEmail(){const e=S.formErr||{}; return `${statusBar}${navBar('Електронна пошта','account')}<form class="scroll acc-form" style="gap:16px" novalidate><div class="field"><label for="accEmail">Нова адреса</label><div class="input ${e.em?'err':''}"><input id="accEmail" type="email" autocomplete="email" value="${esc(S.formVal??S.profile.email)}"></div>${e.em?`<p class="hint err">${e.em}</p>`:''}</div>
+  <div class="field"><label for="accEmailPw">Поточний пароль</label><div class="input ${e.pw?'err':''}"><input id="accEmailPw" type="password" autocomplete="current-password" placeholder="Щоб підтвердити, що це ти"></div>${e.pw?`<p class="hint err">${e.pw}</p>`:''}</div>
+  <div class="card demo-note">${ic('sparkle','s')}<span class="small">Демо: поточний пароль — <b>${esc(S.pw)}</b></span></div><div class="grow"></div><button type="submit" class="btn primary" data-act="saveEmail">Зберегти адресу</button></form>${homebar}`;},
+ password(){const d=S.pwd, t=d.show?'text':'password'; const f=(id,l,ac,ph,err)=>`<div class="field"><label for="${id}">${l}</label><div class="input ${err?'err':''}"><input id="${id}" type="${t}" autocomplete="${ac}" placeholder="${ph}" value="${esc(d[id])}"></div>${err?`<p class="hint err">${err}</p>`:''}</div>`;
+  return `${statusBar}${navBar('Зміна пароля','account')}<form class="scroll acc-form" style="gap:16px" novalidate>${f('pwCur','Поточний пароль','current-password','',d.err)}<button type="button" class="link-btn" data-act="forgot">Забули пароль?</button>${f('pwNew','Новий пароль','new-password','Мінімум 8 символів','')}${f('pwRep','Повторіть новий пароль','new-password','','')}
+  <button type="button" class="show-pw" data-act="pwShowAll" aria-pressed="${d.show}">${ic('eye','s')}${d.show?'Сховати паролі':'Показати паролі'}</button>
+  <div class="card rules" id="pwRules">${pwRules()}</div><div class="card demo-note">${ic('sparkle','s')}<span class="small">Демо: поточний пароль — <b>${esc(S.pw)}</b></span></div><div class="grow"></div><button type="submit" class="btn primary" data-act="savePw" id="savePw" ${pwOk()?'':'disabled'}>Змінити пароль</button></form>${homebar}`;},
+ goal(){return `${statusBar}${navBar('Денна ціль','profile')}<div class="scroll" style="align-items:center;gap:24px;padding-top:24px">${bottle(Math.min(1,S.goalDraft/3000),84)}
+  <div class="stepper" style="width:100%"><button type="button" class="round" data-goal="-250" aria-label="Менше на 250 мл">${ic('minus')}</button><label class="goal-field" for="goalIn"><input id="goalIn" inputmode="numeric" value="${fmt(S.goalDraft)}" aria-label="Денна ціль у мілілітрах"><span class="h2 muted">мл</span></label><button type="button" class="round plus" data-goal="250" aria-label="Більше на 250 мл">${ic('plus')}</button></div>
+  <p class="small muted">± 250 мл — одна склянка</p><div class="card" style="display:flex;gap:12px;padding:16px;background:var(--tint);width:100%"><span style="color:var(--primary)">${ic('drop')}</span><div><p class="body">Більшості дорослих вистачає 1 500–2 500 мл</p><p class="small muted">Почни з комфортної цілі — її завжди можна змінити.</p></div></div>
+  <div class="grow"></div><button type="button" class="btn primary" data-act="saveGoal">Зберегти ціль</button></div>${homebar}`;},
+ reminders(){const r=S.rem; return `${statusBar}${navBar('Нагадування','profile')}<div class="scroll" style="gap:16px">
+  <div class="group"><div class="row" style="cursor:default"><span class="ib">${ic('bell','s')}</span><span class="grow body" style="font-weight:600">Нагадування</span><button type="button" class="toggle" role="switch" aria-checked="${r.on}" aria-label="Нагадування" data-tog="on"></button></div></div>
+  <div style="display:flex;flex-direction:column;gap:8px;opacity:${r.on?1:.45}"><p class="cap">Як часто</p><div class="seg">${[1,2,3].map(h=>`<button type="button" class="${r.every===h?'on':''}" data-every="${h}" ${r.on?'':'disabled'}>${h===1?'Щогодини':`Кожні ${h} год`}</button>`).join('')}</div>
+  <p class="cap" style="margin-top:8px">Активні години</p><div class="group"><div class="row" style="cursor:default"><span class="ib">${ic('clock','s')}</span><span class="grow body">Початок</span><span class="body muted">9:00</span></div><div class="row" style="cursor:default"><span class="ib">${ic('moon','s')}</span><span class="grow body">Кінець — після тиша</span><span class="body muted">21:00</span></div></div>
+  <div class="group" style="margin-top:8px"><div class="row" style="cursor:default"><span class="ib">${ic('sparkle','s')}</span><span class="grow"><span class="body" style="font-weight:600">Розумна пауза</span><br><span class="small muted">Пропускати, якщо я пив воду за останні 30 хв</span></span><button type="button" class="toggle" role="switch" aria-checked="${r.smart}" aria-label="Розумна пауза" data-tog="smart" ${r.on?'':'disabled'}></button></div></div></div>
+  <p class="cap">Так виглядатиме нагадування</p><div class="notif"><span class="ib">${ic('drop','s')}</span><div class="grow"><div class="head"><span class="cap">Water Habit</span><span class="small muted">зараз</span></div><p class="body" style="font-weight:700">Час на ковток води</p><p class="small">Ти вже на ${Math.min(100,Math.round(waterToday()/S.goal*100))}% денної цілі. Ще трохи — і готово.</p></div></div></div>${homebar}`;}
+};
+
+let toastT,snackT,lastAdded=null;
+const pwChecks=()=>{const d=S.pwd, n=d.pwNew; return [['Щонайменше 8 символів',n.length>=8],['Є літера і цифра',/[A-Za-zА-Яа-яІіЇїЄєҐґ]/.test(n)&&/\d/.test(n)],['Відрізняється від поточного',n.length>0&&n!==d.pwCur],['Паролі збігаються',n.length>0&&n===d.pwRep]];};
+const pwOk=()=>S.pwd.pwCur.length>0&&pwChecks().every(x=>x[1]);
+const pwStrength=()=>{const n=S.pwd.pwNew; let k=0; if(n.length>=8)k++; if(n.length>=12)k++; if(/\d/.test(n)&&/[A-Za-zА-Яа-яІіЇїЄєҐґ]/.test(n))k++; if(/[^\wА-Яа-яІіЇїЄєҐґ]/.test(n)||/[A-ZА-Я]/.test(n)&&/[a-zа-я]/.test(n))k++; return n?Math.max(1,k):0;};
+function pwRules(){const k=pwStrength(), L=['','Слабкий','Середній','Добрий','Надійний'][k]; return `<div style="display:flex;justify-content:space-between;align-items:center"><span class="small" style="font-weight:800">Надійність</span><span class="small muted">${L||'—'}</span></div><div class="meter" aria-hidden="true">${[1,2,3,4].map(i=>`<i class="${i<=k?'s'+k:''}"></i>`).join('')}</div>${pwChecks().map(([t,ok])=>`<p class="rule ${ok?'ok':''}">${ic(ok?'check':'dotc','s')}${t}</p>`).join('')}`;}
+function render(){app.innerHTML=V[S.screen](); if(S.screen==='home') S.lastLv=waterToday()/S.goal; requestAnimationFrame(()=>requestAnimationFrame(()=>app.querySelectorAll('.bottle [data-y]').forEach(g=>{g.style.transform=`translateY(${g.dataset.y}px)`;}))); const sc=app.querySelector('.scroll'); if(sc) sc.scrollTop=0;}
+function go(s){if(s==='goal') S.goalDraft=S.goal; S.formErr=null; S.formVal=null; if(s==='password') S.pwd={pwCur:'',pwNew:'',pwRep:'',show:false,err:''}; S.screen=s; closeSheet(); document.getElementById('snack').classList.remove('show'); clearTimeout(snackT); render();}
+function toast(t){const el=document.getElementById('toast'); el.innerHTML=ic('check','s')+t; el.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),2600);}
+function add(ml,id='water'){const dk=drinkById(id)||BUILTIN[0]; const r={id:S.nextId++,kind:dk.id,ml,t:now()}; if(dk.id!=='water'){r.name=dk.name; r.icon=dk.icon; r.water=dk.water;} const before=waterToday(); S.records.push(r); lastAdded=r; if(isWater(r)&&before<S.goal&&waterToday()>=S.goal&&!S.celebrated){S.celebrated=true; S.streak+=1;} render();
+ const el=document.getElementById('snack'); document.getElementById('snackText').textContent=`Додано ${fmt(ml)} мл${r.kind==='water'?'':' · '+drinkName(r).toLowerCase()}`; el.classList.add('show'); clearTimeout(snackT); snackT=setTimeout(()=>el.classList.remove('show'),4000);
+}
+function undo(){if(!lastAdded) return; const before=waterToday(); S.records=S.records.filter(r=>r.id!==lastAdded.id); if(before>=S.goal&&waterToday()<S.goal&&S.celebrated){S.celebrated=false; S.streak-=1;} lastAdded=null; document.getElementById('snack').classList.remove('show'); render();}
+const phoneEl=document.getElementById('phone'); phoneEl.addEventListener('scroll',()=>{phoneEl.scrollTop=0;});
+const sheet=document.getElementById('sheet'), scrim=document.getElementById('scrim'), dialog=document.getElementById('dialog');
+function sheetValid(){const s=S.sheet; return s.ml>=1&&s.ml<=3000&&(s.kind!=='new'||s.newName.trim().length>0);}
+function selWater(){const s=S.sheet; return s.kind==='new'?s.newWater:!!(drinkById(s.kind)||{}).water;}
+function addLabel(){const s=S.sheet; if(!(s.ml>=1&&s.ml<=3000)) return 'Вкажіть обʼєм від 1 до 3 000 мл'; if(s.kind==='new') return s.newName.trim()?`Створити й додати ${fmt(s.ml)} мл`:'Назвіть напій'; const dk=drinkById(s.kind); const w=dk.id==='water'?'води':dk.id==='tea'?'чаю':dk.id==='coffee'?'кави':'· '+dk.name.toLowerCase(); return `Додати ${fmt(s.ml)} мл ${w}`;}
+const countNote=w=>`<div class="count-note ${w?'yes':'no'}" id="countNote">${ic(w?'check':'drop','s')}<span>${w?'Рахується як вода — додасться до денної цілі':'Не рахується як вода — запишемо окремо від цілі'}</span></div>`;
+function renderSheet(){const s=S.sheet;
+ if(s.mode==='badge') return renderBadgeSheet();
+ if(s.mode==='avatar') return renderAvatarSheet();
+ if(s.edit){sheet.innerHTML=`<span class="handle"></span><div style="display:flex;flex-direction:column;gap:4px"><h2 class="h2" id="sheetTitle">Мої напої</h2><p class="small muted">Порядок тут — такий самий у списку вибору. Свої напої можна видалити.</p></div>
+  <div class="group" style="background:var(--app)">${S.drinks.map((dk,i)=>`<div class="row" style="cursor:default;gap:8px;padding:12px"><span class="ib">${ic(dk.icon,'s')}</span><span class="grow"><span class="body">${esc(dk.name)}</span><br><span class="small ${dk.water?'':'note-other'}" style="${dk.water?'color:var(--success-ink)':''}">${dk.water?'Як вода':'Окремо'}</span></span><button type="button" class="icon-btn" data-move="${i}:-1" aria-label="Підняти ${esc(dk.name)} вище" ${i===0?'disabled style="opacity:.3"':''}><svg class="ico s" viewBox="0 0 24 24"><path d="m6 15 6-6 6 6"/></svg></button><button type="button" class="icon-btn" data-move="${i}:1" aria-label="Опустити ${esc(dk.name)} нижче" ${i===S.drinks.length-1?'disabled style="opacity:.3"':''}><svg class="ico s" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>${dk.builtin?'<span style="width:44px"></span>':`<button type="button" class="icon-btn" data-del="${esc(dk.id)}" aria-label="Видалити ${esc(dk.name)}" style="color:var(--danger)"><svg class="ico s" viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg></button>`}</div>`).join('')}</div>
+  <div style="display:flex;flex-direction:column;gap:4px"><button type="button" class="btn primary" data-act="editDone">Готово</button><button type="button" class="btn tertiary" data-act="editCreate">${ic('plus','s')}Створити напій</button></div>${homebar}`; return;}
+ const isNew=s.kind==='new';
+ sheet.innerHTML=`<span class="handle"></span><div class="head" style="align-items:flex-start;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><h2 class="h2" id="sheetTitle">${isNew?'Новий напій':'Що випили?'}</h2><p class="small muted">${isNew?'Створи свій напій — він зʼявиться у списку вибору.':'Обери напій і обʼєм.'}</p></div>${isNew?'':'<button type="button" class="btn tertiary m" data-act="edit" style="flex:none">Змінити</button>'}</div>
+ ${isNew?`<div class="name-field"><label class="small" style="font-weight:700" for="nameIn">Назва напою</label><div class="input"><input id="nameIn" maxlength="20" placeholder="Наприклад, компот або мінералка" value="${esc(s.newName)}" autocomplete="off"></div></div>
+  <div class="name-field"><span class="small" style="font-weight:700">Іконка</span><div class="icons">${ICONS.map(n=>`<button type="button" class="chip ${s.newIcon===n?'on':''}" data-icon="${n}" aria-label="Іконка" aria-pressed="${s.newIcon===n}" style="padding:10px 0">${ic(n)}</button>`).join('')}</div></div>
+  <div class="save-row card" style="background:var(--app);padding:12px 16px"><span><span class="body">Рахувати як воду</span><br><span class="small muted">Для мінералки чи води з лимоном</span></span><button type="button" class="toggle" role="switch" aria-checked="${s.newWater}" aria-label="Рахувати як воду" data-act="waterToggle"></button></div>`
+ :`<div class="types">${S.drinks.map(dk=>`<button type="button" class="chip ${s.kind===dk.id?'on':''}" data-drink="${esc(dk.id)}" aria-pressed="${s.kind===dk.id}">${ic(dk.icon)}<span class="nm">${esc(dk.name)}</span>${dk.water?'<span class="wmark" aria-label="рахується як вода"></span>':''}</button>`).join('')}${S.drinks.length<12?`<button type="button" class="chip add" data-kind="new">${ic('plus')}<span class="nm">Новий</span></button>`:''}</div>`}
+ ${countNote(selWater())}
+ <div class="stepper"><button type="button" class="round" data-step="-50" aria-label="Менше на 50 мл">${ic('minus')}</button><div class="center" style="display:flex;flex-direction:column;gap:8px;align-items:center"><label class="ml-field" for="mlIn"><input id="mlIn" inputmode="numeric" pattern="[0-9]*" maxlength="4" value="${s.ml||''}" aria-label="Обʼєм у мілілітрах" aria-describedby="mlHint"><span>мл</span></label><p class="small muted" id="mlHint">Будь-який обʼєм від 1 до 3 000 мл</p></div><button type="button" class="round plus" data-step="50" aria-label="Більше на 50 мл">${ic('plus')}</button></div>
+ <div class="presets">${[150,250,350,500].map(v=>`<button type="button" class="${s.ml===v?'on':''}" data-preset="${v}">${v}</button>`).join('')}</div>
+ <div style="display:flex;flex-direction:column;gap:4px"><button type="button" class="btn primary" data-act="sheetAdd" id="sheetAddBtn" ${sheetValid()?'':'disabled'}>${addLabel()}</button>${isNew?`<button type="button" class="btn secondary" data-act="createOnly" id="createOnlyBtn" ${s.newName.trim()?'':'disabled'}>Лише створити</button><button type="button" class="btn tertiary" data-act="newCancel">Назад до списку</button>`:'<button type="button" class="btn tertiary" data-act="sheetClose">Скасувати</button>'}</div>${homebar}`;}
+function openSheet(){S.sheet={mode:'drink',kind:S.drinks[0].id,ml:350,newName:'',newWater:false,newIcon:'sparkle',edit:false}; renderSheet(); sheet.classList.add('show'); scrim.classList.add('show'); setTimeout(()=>{sheet.querySelector('.chip.on')?.focus({preventScroll:true}); phoneEl.scrollTop=0;},50);}
+const pick=(attr,list,cur,lab)=>`<div class="icons">${list.map(n=>`<button type="button" class="chip ${cur===n?'on':''}" data-${attr}="${n}" aria-label="${lab}" aria-pressed="${cur===n}" style="padding:10px 0">${ic(n)}</button>`).join('')}</div>`;
+const swatches=(cur)=>`<div class="swatches">${COLORS.map(c=>`<button type="button" class="sw ${cur===c[0]?'on':''}" data-color="${c[0]}" aria-label="Колір" aria-pressed="${cur===c[0]}" style="background:${c[1]}"></button>`).join('')}</div>`;
+function renderBadgeSheet(){const s=S.sheet, a=ACH[s.badge];
+ sheet.innerHTML=`<span class="handle"></span><div style="display:flex;align-items:center;gap:16px"><div class="badge-prev ${a.got?'':'lock'}">${badgeCircle(a,{icon:s.dIcon,color:s.dColor},72)}</div><div style="display:flex;flex-direction:column;gap:4px"><h2 class="h2" id="sheetTitle">${a.t}</h2><p class="small muted">${a.got?'Отримано':'Ще не отримано · '+achLeft(a)}</p></div></div>
+ <div class="name-field"><span class="small" style="font-weight:800">Іконка</span>${pick('bicon',BADGE_ICONS,s.dIcon,'Іконка досягнення')}</div>
+ <div class="name-field"><span class="small" style="font-weight:800">Колір</span>${swatches(s.dColor)}${a.got?'':'<p class="small muted">Колір зʼявиться, щойно отримаєш досягнення.</p>'}</div>
+ <div style="display:flex;flex-direction:column;gap:4px"><button type="button" class="btn primary" data-act="badgeSave">Зберегти</button><button type="button" class="btn tertiary" data-act="badgeReset">Повернути стандартну</button></div>${homebar}`;}
+function renderAvatarSheet(){const s=S.sheet, d=s.dAv;
+ sheet.innerHTML=`<span class="handle"></span><div style="display:flex;flex-direction:column;align-items:center;gap:12px">${avatarHTML(d,96)}<h2 class="h2" id="sheetTitle">Фото профілю</h2></div>
+ <div style="display:flex;flex-direction:column;gap:8px"><label class="btn secondary" for="photoIn" tabindex="0" role="button" style="cursor:pointer">${ic('camera','s')}${d.type==='photo'?'Обрати інше фото':'Завантажити фото'}</label><input id="photoIn" type="file" accept="image/*" class="sr-only">${d.type==='photo'?'<button type="button" class="btn tertiary" data-act="photoRemove">Прибрати фото</button>':''}</div>
+ <div class="name-field"><span class="small" style="font-weight:800">Або значок</span><div class="icons"><button type="button" class="chip ${d.type==='letter'?'on':''}" data-avletter="1" aria-label="Літера" aria-pressed="${d.type==='letter'}" style="padding:10px 0;font:900 20px/24px var(--font)">${esc(initial())}</button>${['drop','leaf','flame','sun','moon','star','heart','bolt','crown','sparkle','coffee'].map(n=>`<button type="button" class="chip ${d.type==='icon'&&d.icon===n?'on':''}" data-avicon="${n}" aria-label="Значок" aria-pressed="${d.type==='icon'&&d.icon===n}" style="padding:10px 0">${ic(n)}</button>`).join('')}</div></div>
+ <div class="name-field"><span class="small" style="font-weight:800">Фон</span>${swatches(d.color)}</div>
+ <div style="display:flex;flex-direction:column;gap:4px"><button type="button" class="btn primary" data-act="avatarSave">Зберегти</button><button type="button" class="btn tertiary" data-act="sheetClose">Скасувати</button></div>${homebar}`;}
+function showSheet(){sheet.classList.add('show'); scrim.classList.add('show'); sheet.scrollTop=0; setTimeout(()=>{sheet.querySelector('.chip.on,.btn')?.focus({preventScroll:true}); phoneEl.scrollTop=0;},50);}
+function readPhoto(file){if(!file||!/^image\//.test(file.type)){toast('Обери файл-зображення'); return;} const url=URL.createObjectURL(file); const img=new Image(); img.onload=()=>{const n=320, c=document.createElement('canvas'); c.width=c.height=n; const k=Math.min(img.width,img.height); c.getContext('2d').drawImage(img,(img.width-k)/2,(img.height-k)/2,k,k,0,0,n,n); URL.revokeObjectURL(url); S.sheet.dAv={...S.sheet.dAv,type:'photo',src:c.toDataURL('image/jpeg',.85)}; renderAvatarSheet();}; img.onerror=()=>{URL.revokeObjectURL(url); toast('Не вдалося відкрити фото');}; img.src=url;}
+function createDrink(){const s=S.sheet; let name=s.newName.trim().slice(0,20); if(!name) return null; name=name.charAt(0).toUpperCase()+name.slice(1); const ex=S.drinks.find(x=>x.name.toLowerCase()===name.toLowerCase()); if(ex) return ex; const dk={id:'c'+Date.now().toString(36),name,icon:s.newIcon,water:s.newWater,builtin:false}; S.drinks.push(dk); saveDrinks(); return dk;}
+function closeSheet(){sheet.classList.remove('show'); if(!dialog.classList.contains('show')) scrim.classList.remove('show');}
+function openDialog(kind='logout'){S.dlg=kind; const del=kind==='delete'; document.getElementById('dlgTitle').textContent=del?'Видалити акаунт?':'Вийти з акаунта?'; dialog.querySelector('p').textContent=del?'Усі записи, серія, свої напої та налаштування буде видалено назавжди. Це не можна скасувати.':'Твої записи й серія збережуться та повернуться після наступного входу.'; document.getElementById('dlgYes').textContent=del?'Видалити назавжди':'Вийти'; dialog.querySelector('.dot').innerHTML=ic(del?'trash':'logout'); dialog.classList.add('show'); scrim.classList.add('show'); document.getElementById('dlgNo').focus({preventScroll:true}); phoneEl.scrollTop=0;}
+function closeDialog(){dialog.classList.remove('show'); scrim.classList.remove('show');}
+
+document.getElementById('phone').addEventListener('click',e=>{
+ const t=e.target.closest('button,[data-go]'); if(!t||t.disabled) return;
+ const d=t.dataset;
+ if(d.go){go(d.go); return;}
+ if(d.add){add(+d.add); return;}
+ if(d.hist){S.histTab=d.hist; if(d.hist==='day') S.histOff=0; if(d.hist==='month') S.monthOff=0; render(); return;}
+ if(d.off){S.histOff=Math.min(0,Math.max(-400,S.histOff+(+d.off))); render(); return;}
+ if(d.moff){S.monthOff=Math.min(0,Math.max(-12,S.monthOff+(+d.moff))); render(); return;}
+ if(d.openday!==undefined){S.histTab='day'; S.histOff=+d.openday; render(); return;}
+ if(d.group){S.openGroups[d.group]=!S.openGroups[d.group]; render(); return;}
+ if(d.badge!==undefined){const a=ACH[+d.badge], l=badgeLook(a); S.sheet={mode:'badge',badge:+d.badge,dIcon:l.icon,dColor:l.color}; renderBadgeSheet(); showSheet(); return;}
+ if(d.bicon){S.sheet.dIcon=d.bicon; renderBadgeSheet(); return;}
+ if(d.color){if(S.sheet.mode==='badge'){S.sheet.dColor=d.color; renderBadgeSheet();} else {S.sheet.dAv={...S.sheet.dAv,color:d.color}; if(S.sheet.dAv.type==='photo') S.sheet.dAv.type=S.sheet.dAv.icon?'icon':'letter'; renderAvatarSheet();} return;}
+ if(d.avletter){S.sheet.dAv={...S.sheet.dAv,type:'letter'}; renderAvatarSheet(); return;}
+ if(d.avicon){S.sheet.dAv={...S.sheet.dAv,type:'icon',icon:d.avicon}; renderAvatarSheet(); return;}
+ if(d.drink){S.sheet.kind=d.drink; renderSheet(); return;}
+ if(d.icon){S.sheet.newIcon=d.icon; renderSheet(); return;}
+ if(d.move){const [i,dir]=d.move.split(':').map(Number); const j=i+dir; if(j<0||j>=S.drinks.length) return; [S.drinks[i],S.drinks[j]]=[S.drinks[j],S.drinks[i]]; saveDrinks(); renderSheet(); sheet.querySelector(`[data-move="${j}:${dir}"]`)?.focus({preventScroll:true}); return;}
+ if(d.del){const k=S.drinks.findIndex(x=>x.id===d.del); if(k<0) return; const n=S.drinks[k].name; S.drinks.splice(k,1); saveDrinks(); renderSheet(); toast(`«${n}» видалено`); return;}
+ if(d.kind){S.sheet.kind=d.kind; renderSheet(); if(d.kind==='new') setTimeout(()=>document.getElementById('nameIn')?.focus({preventScroll:true}),30); return;}
+ if(d.step){const cur=S.sheet.ml||0; S.sheet.ml=Math.max(1,Math.min(3000,cur+(+d.step))); renderSheet(); return;}
+ if(d.preset){S.sheet.ml=+d.preset; renderSheet(); return;}
+ if(d.goal){S.goalDraft=Math.max(500,Math.min(5000,S.goalDraft+(+d.goal))); render(); return;}
+ if(d.every){S.rem.every=+d.every; render(); return;}
+ if(d.tog){S.rem[d.tog]=!S.rem[d.tog]; render(); return;}
+ if(d.ptog){S.profile[d.ptog]=!S.profile[d.ptog]; saveProfile(); t.setAttribute('aria-checked',S.profile[d.ptog]); return;}
+ switch(d.act){
+  case 'provider': S.records=[]; S.celebrated=false; go('home'); toast('Акаунт створено'); break;
+  case 'login': if(!S.records.length) S.records=sample(); go('home'); break;
+  case 'pw': {const em=document.getElementById('em'); S.email=em?em.value:S.email; S.pwShow=!S.pwShow; render(); break;}
+  case 'sheet': openSheet(); break;
+  case 'sheetClose': closeSheet(); break;
+  case 'waterToggle': {S.sheet.newWater=!S.sheet.newWater; t.setAttribute('aria-checked',S.sheet.newWater); const n=document.getElementById('countNote'); if(n) n.outerHTML=countNote(S.sheet.newWater); break;}
+  case 'edit': S.sheet.edit=true; renderSheet(); break;
+  case 'editDone': S.sheet.edit=false; if(!drinkById(S.sheet.kind)) S.sheet.kind=S.drinks[0].id; renderSheet(); break;
+  case 'editCreate': S.sheet.edit=false; S.sheet.kind='new'; renderSheet(); setTimeout(()=>document.getElementById('nameIn')?.focus({preventScroll:true}),30); break;
+  case 'newCancel': S.sheet.kind=S.drinks[0].id; renderSheet(); break;
+  case 'createOnly': {const dk=createDrink(); if(!dk) break; S.sheet.kind=dk.id; renderSheet(); toast(`«${dk.name}» додано до списку`); break;}
+  case 'sheetAdd': {if(!sheetValid()) break; const s=S.sheet; let id=s.kind; if(id==='new'){const dk=createDrink(); if(!dk) break; id=dk.id;} closeSheet(); add(s.ml,id); break;}
+  case 'saveGoal': {const inp=document.getElementById('goalIn'); const v=parseInt((inp.value||'').replace(/\D/g,''),10); if(v>=500&&v<=5000) S.goal=v; else S.goal=S.goalDraft; S.celebrated=waterToday()>=S.goal; go('profile'); toast('Ціль збережено'); break;}
+  case 'logout': openDialog('logout'); break;
+  case 'deleteAcc': openDialog('delete'); break;
+  case 'saveName': {const v=document.getElementById('accName').value.trim().replace(/\s+/g,' '); S.formVal=v; if(v.length<2){S.formErr='Імʼя має містити щонайменше 2 символи'; render(); break;} if(!/^[A-Za-zА-Яа-яІіЇїЄєҐґʼ'’\- ]+$/.test(v)){S.formErr='Лише літери, пробіл, апостроф чи дефіс'; render(); break;} S.profile.name=v.charAt(0).toUpperCase()+v.slice(1); saveProfile(); go('account'); toast('Імʼя збережено'); break;}
+  case 'saveEmail': {const v=document.getElementById('accEmail').value.trim(), pw=document.getElementById('accEmailPw').value; S.formVal=v; const er={}; if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) er.em='Перевірте адресу: має бути вигляду name@email.com'; else if(v.toLowerCase()===S.profile.email.toLowerCase()) er.em='Це вже твоя поточна адреса'; if(pw!==S.pw) er.pw=pw?'Невірний пароль':'Введіть пароль, щоб підтвердити'; if(er.em||er.pw){S.formErr=er; render(); break;} S.profile.email=v; saveProfile(); go('account'); toast('Email оновлено'); break;}
+  case 'pwShowAll': S.pwd.show=!S.pwd.show; render(); break;
+  case 'forgot': toast(`Лист для скидання надіслано на ${S.profile.email}`); break;
+  case 'savePw': {if(!pwOk()) break; if(S.pwd.pwCur!==S.pw){S.pwd.err='Невірний поточний пароль'; render(); document.getElementById('pwCur')?.focus({preventScroll:true}); break;} S.pw=S.pwd.pwNew; S.pwChanged=true; go('account'); toast('Пароль змінено'); break;}
+  case 'avatar': S.sheet={mode:'avatar',dAv:{...S.profile.avatar}}; renderAvatarSheet(); showSheet(); break;
+  case 'photoRemove': {const d=S.sheet.dAv; S.sheet.dAv={type:d.icon&&d.icon!=='drop'?'icon':'letter',color:d.color,icon:d.icon||'drop'}; renderAvatarSheet(); break;}
+  case 'avatarSave': S.profile.avatar={...S.sheet.dAv}; saveProfile(); closeSheet(); render(); toast('Фото профілю оновлено'); break;
+  case 'badgeSave': {const a=ACH[S.sheet.badge]; S.profile.badges[a.id]={icon:S.sheet.dIcon,color:S.sheet.dColor}; saveProfile(); closeSheet(); render(); toast(`Іконку «${a.t}» змінено`); break;}
+  case 'badgeReset': S.sheet.dIcon=ACH[S.sheet.badge].icon; S.sheet.dColor='gold'; renderBadgeSheet(); break;
+ }
+});
+document.getElementById('undo').addEventListener('click',undo);
+scrim.addEventListener('click',()=>{closeSheet(); closeDialog();});
+document.getElementById('dlgNo').addEventListener('click',closeDialog);
+document.getElementById('dlgYes').addEventListener('click',()=>{closeDialog(); if(S.dlg==='delete'){try{localStorage.removeItem('wh-profile'); localStorage.removeItem('wh-drinks-v2');}catch(e){} fresh(); render(); toast('Акаунт видалено'); return;} go('register');});
+document.getElementById('phone').addEventListener('submit',e=>{
+ if(e.target.classList.contains('acc-form')){e.preventDefault(); return;}
+ if(e.target.id!=='emailForm') return; e.preventDefault();
+ const em=document.getElementById('em').value.trim(); S.email=em;
+ if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){S.emailErr='Перевірте адресу: має бути вигляду name@email.com'; render(); return;}
+ if(em.toLowerCase()==='taken@mail.com'){S.emailErr='Цей email уже зареєстровано. Увійдіть або вкажіть інший.'; render(); return;}
+ S.emailErr=''; S.records=[]; S.celebrated=false; go('home'); toast('Акаунт створено');
+});
+sheet.addEventListener('input',e=>{if(e.target.id==='nameIn'){S.sheet.newName=e.target.value; const b=document.getElementById('sheetAddBtn'); b.textContent=addLabel(); b.disabled=!sheetValid(); const c=document.getElementById('createOnlyBtn'); if(c) c.disabled=!S.sheet.newName.trim(); return;} if(e.target.id!=='mlIn') return; const v=e.target.value.replace(/\D/g,'').slice(0,4); if(e.target.value!==v) e.target.value=v; S.sheet.ml=v?parseInt(v,10):0; const b=document.getElementById('sheetAddBtn'); b.textContent=addLabel(); b.disabled=!sheetValid(); sheet.querySelectorAll('[data-preset]').forEach(x=>x.classList.toggle('on',+x.dataset.preset===S.sheet.ml));});
+app.addEventListener('input',e=>{const id=e.target.id; if(S.pwd&&['pwCur','pwNew','pwRep'].includes(id)){S.pwd[id]=e.target.value; if(id==='pwCur'&&S.pwd.err){S.pwd.err=''; const w=e.target.closest('.input'); w.classList.remove('err'); w.parentNode.querySelector('.hint.err')?.remove();} document.getElementById('pwRules').innerHTML=pwRules(); document.getElementById('savePw').disabled=!pwOk();}});
+sheet.addEventListener('change',e=>{if(e.target.id==='photoIn') readPhoto(e.target.files&&e.target.files[0]);});
+sheet.addEventListener('keydown',e=>{if(e.target.matches('label[for=photoIn]')&&(e.key==='Enter'||e.key===' ')){e.preventDefault(); document.getElementById('photoIn').click(); return;}if((e.target.id==='mlIn'||e.target.id==='nameIn')&&e.key==='Enter'){e.preventDefault(); const b=document.getElementById('sheetAddBtn'); if(!b.disabled) b.click();}});
+document.getElementById('phone').addEventListener('change',e=>{if(e.target.id==='goalIn'){const v=parseInt(e.target.value.replace(/\D/g,''),10); if(v) S.goalDraft=Math.max(500,Math.min(5000,v)); render();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSheet(); closeDialog();}});
+document.querySelector('.jump').addEventListener('click',e=>{const b=e.target.closest('button'); if(!b) return; const j=b.dataset.jump;
+ if(j==='reset'){fresh(); closeSheet(); closeDialog(); render(); return;}
+ if(j!=='register'&&!S.records.length) S.records=sample();
+ go(j);});
+render();
+</script>
